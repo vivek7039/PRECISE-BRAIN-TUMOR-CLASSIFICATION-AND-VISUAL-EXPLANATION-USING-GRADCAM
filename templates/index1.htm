@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Image Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap">
+</head>
+<body>
+    <header>
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="NITK-2024" width="70px" height="70px">
+        <nav>
+            <ul class="nav__links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/performance">Performance</a></li>
+            </ul>
+        </nav>
+        <div class="contact__link" onmouseover="showDropdown()" onmouseleave="hideDropdown()">
+            <button>Quick Links</button>
+            <div class="dropdown-content" id="dropdownContent">
+                <a href="https://www.cancer.gov/types/brain">More About Brain Tumors</a>
+                <a href="https://neurodoctors.co.in/neurosurgeon-in-india/">Best Neurosurgeons(India)</a>
+                <a href="https://www.mayoclinic.org/diseases-conditions/brain-tumor/symptoms-causes/syc-20350084">Symptoms and Casues</a>
+            </div>
+        </div>
+    </header>
+    <div class="progress-container">
+        <div class="progress-bar" id="myBar"></div>
+    </div>
+    <div class="parent">
+        <div class="container">
+            <h1>Brain Tumor Classification</h1>
+            <form id="imageForm" action="/" method="post" enctype="multipart/form-data" onclick="document.getElementById('fileInput').click()">
+                <div id="imagePreview" class="image-preview">
+                    <img id="inputImage" src="#" alt="Input Image" class="image-preview">
+                    {% if result %}
+                    <img id="heatmapImage" src="{{ heatmap }}" alt="Heatmap Image" class="image-preview">
+                    {% endif %}
+                </div>
+                <input type="file" name="image" id="fileInput" accept="image/*" required onchange="previewImage(event)">
+            </form>
+        </div>
+
+
+        
+        <div class="container1">
+            {% if result %}
+            <div class="result-card" onclick="flipCard(this)">
+                <div class="result-front">
+                    <h2>Result:</h2>
+                    <p style="color: black;">{{ result }}</p>
+                </div>
+                <div class="result-back">
+                    <h2>More Info:</h2>
+                    {% if additional_info %}
+                        <p>{{ additional_info['description'] }}</p>
+                        {% if additional_info['references'] %}
+                            <h4>References:</h4>
+                            <ul>
+                                {% for ref in additional_info['references'] %}
+                                    <li><a href="{{ ref['link'] }}" target="_blank">{{ ref['title'] }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% else %}
+                        <p>No additional information available.</p>
+                    {% endif %}
+                </div>  
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+    
+    <div class="button-predict">
+        <button onclick="predict()">Predict</button>
+    </div>
+    
+    <!-- Textarea to display output -->
+    <div class="output-container">
+        <h3>Output:</h3>
+        <textarea id="outputTextArea" rows="10" cols="50" readonly style="color: black;"></textarea>
+    </div>
+
+    <div class="opd" style="color: black;overflow-y: scroll;width: 300px; height: 300px; border: 1px solid;">
+
+    </div>
+
+    <script>
+        
+        let flag =false
+        window.onload = ()=>{
+            move(0,"")
+        }
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('inputImage');
+                output.src = reader.result;
+                output.style.display = 'block'; // Show the input image
+                var heatmapImage = document.getElementById('heatmapImage');
+                if (heatmapImage) {
+                    heatmapImage.style.display = 'none'; // Hide the heatmap image if exists
+                }
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+
+        if (flag) {
+            document.querySelector("#heatmapImage").style.visibility = 'hidden'; // Hide the heatmap image if exists
+        }
+        else{
+            document.querySelector("#heatmapImage").style.visibility = 'initial'
+        }
+
+        function predict() {
+            // document.querySelector('.parent').style.display = 'none';
+            var inputImage = document.getElementById('inputImage');
+            inputImage.src = '';
+            var heatmapImage = document.getElementById('heatmapImage');
+            if (heatmapImage) {
+                heatmapImage.src = '{{ heatmap }}'; // Update heatmap image source
+                heatmapImage.style.display = 'block'; // Show the heatmap image
+            } else {
+                var newHeatmapImage = document.createElement('img');
+                newHeatmapImage.id = 'heatmapImage';
+                newHeatmapImage.src = '{{ heatmap }}';
+                newHeatmapImage.alt = 'Heatmap Image';
+                newHeatmapImage.className = 'image-preview';
+                var imagePreview = document.getElementById('imagePreview');
+                imagePreview.appendChild(newHeatmapImage);
+                newHeatmapImage.style.visibility='hidden'; // Add the heatmap image to image preview container
+            }
+            document.getElementById("imageForm").submit();
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function showDropdown() {
+            document.getElementById("dropdownContent").style.display = "block";
+        }
+
+        function hideDropdown() {
+            document.getElementById("dropdownContent").style.display = "none";
+        }
+
+        // Function to display output in the textarea
+        function displayOutput(output) {
+            var outputTextArea = document.getElementById("outputTextArea");
+            outputTextArea.value = output;
+            let texts = `{{ output|replace('\n', '\\n') }}`.split('\n')
+            console.log(texts)
+            move(texts.length,texts);
+        }
+
+        // Call the displayOutput function to display the output
+        // console.log()
+        displayOutput(`{{ output|replace('\n', '\\n') }}`);
+
+        // Simulate progress bar
+        function move(limit,texts) {
+            var elem = document.getElementById("myBar");
+            var width = 0;
+            var id = setInterval(frame, 100);
+            function frame() {
+                var outputTextArea = document.getElementById("outputTextArea");
+                let opd = document.querySelector('.opd')
+                // console.log(outputTextArea.value)
+                let oldText = width==0 ? "" : outputTextArea.value;
+                outputTextArea.value = oldText+ "\n"+ texts[width];
+                let d = document.createElement('div')
+                d.innerHTML = texts[width] + "from width "+width;
+                d.style.color='black'
+                opd.appendChild(d)
+                // outputTextArea.value= width
+            // let texts = `{{ output|replace('\n', '\\n') }}`.split('\n')
+            // move(texts.length);
+                if (width >= limit-1) {
+                    clearInterval(id);
+                    document.querySelector(".parent").style.display = "flex";
+                    document.querySelector(".progress-container").style.display = "none";
+                    flag=true
+                    document.querySelector("#heatmapImage").style.visibility='initial'
+                } else {
+                    width++;
+                    elem.style.width = width + "%";
+                }
+            }
+        }
+        
+
+    </script>
+</body>
+</html>

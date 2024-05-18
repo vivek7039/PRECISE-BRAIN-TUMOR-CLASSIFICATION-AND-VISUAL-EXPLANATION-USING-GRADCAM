@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Image Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap">
+    <style>
+        .info-box {
+            border: 2px solid black;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .info-box h2 {
+            color: #333;
+        }
+
+        .pair-images {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .pair-images img {
+            width: 300px;
+            height: 300px;
+            margin: 0 10px;
+        }
+
+        .pair-images1 img {
+            width: 400px;
+            height: 400px;
+            margin: 0 10px;
+        }
+
+        .placeholder-text {
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="NITK-2024" width="200px" height="25px">
+        <nav>
+            <ul class="nav__links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/performance">Performance</a></li>
+            </ul>
+        </nav>
+        <div class="contact__link" onmouseover="showDropdown()" onmouseleave="hideDropdown()">
+            <button>Quick Links</button>
+            <div class="dropdown-content" id="dropdownContent">
+                <a href="https://www.cancer.gov/types/brain">More About Brain Tumors</a>
+                <a href="https://neurodoctors.co.in/neurosurgeon-in-india/">Best Neurosurgeons(India)</a>
+                <a href="https://www.mayoclinic.org/diseases-conditions/brain-tumor/symptoms-causes/syc-20350084">Symptoms
+                    and Casues</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="info-box">
+        <h2>BRAIN TUMOR CLASSIFICATION & SEGMENTATION USING GRADCAM</h2>
+        <br>
+        <div class="pair-images">
+            <img src="{{ url_for('static', filename='accuracy.png') }}" alt="Image 1">
+            <img src="{{ url_for('static', filename='loss.png') }}" alt="Image 2">
+        </div>
+        <p class="placeholder-text">The classification report demonstrates high precision, recall, and F1-score across all tumor types, indicating strong performance in correctly identifying each class. The model achieves particularly impressive results for pituitary tumors, with perfect precision, recall, and F1-score, highlighting its efficacy in distinguishing this tumor 16 type. Overall, the weighted average F1-score of 0.98 reflects excellent overall perfor- mance, suggesting that the model effectively balances precision and recall across all classes. These results underscore the model’s potential to serve as a reliable tool for brain tumor classification, with implications for improving clinical decision-making and patient care outcomes.</p>
+        <br>
+        <div class="pair-images1">
+            <img src="{{ url_for('static', filename='cm.png') }}" alt="Image 3">
+            <img src="{{ url_for('static', filename='cm1.png') }}" alt="Image 4">
+        </div>
+        <p class="placeholder-text">The plotted training and validation graphs for accuracy and loss provide a visual
+            representation of the model’s performance throughout the training process. These
+            graphs offer insights into how the model learns over epochs, with increasing accuracy
+            indicating improved classification performance and decreasing loss reflecting better
+            alignment with training objectives. Discrepancies between training and validation
+            curves can indicate potential issues such as overfitting or underfitting, aiding in the
+            identification of necessary adjustments to optimize model performance and generalization.</p>
+    </div>
+
+    <script>
+        function showDropdown() {
+            document.getElementById("dropdownContent").style.display = "block";
+        }
+
+        function hideDropdown() {
+            document.getElementById("dropdownContent").style.display = "none";
+        }
+    </script>
+</body>
+</html>

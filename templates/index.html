@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Image Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap">
+    <style>
+        .progress-bar {
+            width: 20%;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-left: 80px;
+            border-top-width: 15px;
+        }
+
+        .progress {
+            height: 20px;
+            background-color: #4caf50;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="NITK-2024" width="70px" height="70px">
+        <nav>
+            <ul class="nav__links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/performance">Performance</a></li>
+            </ul>
+        </nav>
+        <div class="contact__link" onmouseover="showDropdown()" onmouseleave="hideDropdown()">
+            <button>Quick Links</button>
+            <div class="dropdown-content" id="dropdownContent">
+                <a href="https://www.cancer.gov/types/brain">More About Brain Tumors</a>
+                <a href="https://neurodoctors.co.in/neurosurgeon-in-india/">Best Neurosurgeons(India)</a>
+                <a href="https://www.mayoclinic.org/diseases-conditions/brain-tumor/symptoms-causes/syc-20350084">Symptoms
+                    and Casues</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="parent">
+        <div class="container">
+            <h1>Brain Tumor Classification</h1>
+            <form id="imageForm" action="/" method="post" enctype="multipart/form-data"
+                onclick="document.getElementById('fileInput').click()">
+                <div id="imagePreview" class="image-preview">
+                    <img id="inputImage" src="#" alt="Input Image" class="image-preview">
+                    {% if result %}
+                    <img id="heatmapImage" src="{{ heatmap }}" alt="Heatmap Image" class="image-preview"
+                        style="display: none;">
+                    {% endif %}
+                </div>
+                <input type="file" name="image" id="fileInput" accept="image/*" required onchange="previewImage(event)">
+            </form>
+        </div>
+
+        <textarea id="outputTextArea" rows="10" cols="50" readonly style="color: black;"></textarea>
+
+        
+    </div>
+<div class="container1" id="resultCard" style="display: none;">
+            {% if result %}
+            <div class="result-card" onclick="flipCard(this)">
+                <div class="result-front">
+                    <h2>Result:</h2>
+                    <p style="color: black;">{{ result }}</p>
+                </div>
+                <div class="result-back">
+                    <h2 >More Info:</h2>
+                    {% if additional_info %}
+                    <p style="margin-left: 15px;">{{ additional_info['description'] }}</p>
+                    {% if additional_info['references'] %}
+                    <h4>References:</h4>
+                    <ul>
+                        {% for ref in additional_info['references'] %}
+                        <li><a href="{{ ref['link'] }}" target="_blank">{{ ref['title'] }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% else %}
+                    <p>No additional information available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    <div class="button-predict">
+        <button id="predictButton" onclick="predict()">Predict</button>
+    </div>
+<br>
+    <!-- Add a progress bar below the predict button -->
+    <div class="progress-bar">
+        <div id="progress" class="progress" style="width: 0%;"></div>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('inputImage');
+                output.src = reader.result;
+                output.style.display = 'block'; // Show the input image
+                var heatmapImage = document.getElementById('heatmapImage');
+                if (heatmapImage) {
+                    heatmapImage.style.display = 'none'; // Hide the heatmap image if exists
+                }
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function predict() {
+            var inputImage = document.getElementById('inputImage');
+            inputImage.src = '';
+            var heatmapImage = document.getElementById('heatmapImage');
+            if (heatmapImage) {
+                heatmapImage.src = '{{ heatmap }}'; // Update heatmap image source
+                heatmapImage.style.display = 'block'; // Show the heatmap image
+                document.getElementById('resultCard').style.display = 'block'; // Show the result card
+            } else {
+                var newHeatmapImage = document.createElement('img');
+                newHeatmapImage.id = 'heatmapImage';
+                newHeatmapImage.src = '{{ heatmap }}';
+                newHeatmapImage.alt = 'Heatmap Image';
+                newHeatmapImage.className = 'image-preview';
+                var imagePreview = document.getElementById('imagePreview');
+                imagePreview.appendChild(newHeatmapImage); // Add the heatmap image to image preview container
+            }
+            document.getElementById("imageForm").submit();
+        }
+
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function showDropdown() {
+            document.getElementById("dropdownContent").style.display = "block";
+        }
+
+        function hideDropdown() {
+            document.getElementById("dropdownContent").style.display = "none";
+        }
+
+        function displayOutput(output) {
+            var outputTextArea = document.getElementById("outputTextArea");
+            var lines = output.split("\n");
+            var index = 0;
+
+            function printLine() {
+                if (index < lines.length) {
+                    outputTextArea.value += lines[index] + "\n";
+                    index++;
+                    // Scroll to the bottom of the textarea
+                    outputTextArea.scrollTop = outputTextArea.scrollHeight;
+
+                    // Update progress bar
+                    var progress = (index / lines.length) * 100;
+                    document.getElementById('progress').style.width = progress + '%';
+
+                    setTimeout(printLine, 50); // Adjust the interval as needed
+                } else {
+                    // Once all lines are printed, show the heatmap image
+                    var heatmapImage = document.getElementById('heatmapImage');
+                    if (heatmapImage) {
+                        heatmapImage.src = '{{ heatmap }}'; // Update heatmap image source
+                        heatmapImage.style.display = 'block'; // Show the heatmap image
+                        document.getElementById('resultCard').style.display = 'block'; // Show the result card
+                    } else {
+                        var newHeatmapImage = document.createElement('img');
+                        newHeatmapImage.id = 'heatmapImage';
+                        newHeatmapImage.src = '{{ heatmap }}';
+                        newHeatmapImage.alt = 'Heatmap Image';
+                        newHeatmapImage.className = 'image-preview';
+                        var imagePreview = document.getElementById('imagePreview');
+                        imagePreview.appendChild(newHeatmapImage); // Add the heatmap image to image preview container
+                    }
+                }
+            }
+
+            printLine();
+        }
+
+        // Call the displayOutput function to display the output
+        displayOutput(`{{ output|replace('\n', '\\n') }}`);
+    </script>
+</body>
+
+</html>
+

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Image Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap">
+</head>
+<body>
+    <header>
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="NITK-2024" width="200px" height="25px">
+        <nav>
+            <ul class="nav__links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/performance">Performance</a></li>
+            </ul>
+        </nav>
+        <div class="contact__link" onmouseover="showDropdown()" onmouseleave="hideDropdown()">
+            <button>Quick Links</button>
+            <div class="dropdown-content" id="dropdownContent">
+                <a href="https://www.cancer.gov/types/brain">More About Brain Tumors</a>
+                <a href="https://neurodoctors.co.in/neurosurgeon-in-india/">Best Neurosurgeons(India)</a>
+                <a href="https://www.mayoclinic.org/diseases-conditions/brain-tumor/symptoms-causes/syc-20350084">Symptoms
+                    and Casues</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="info-box" style="border: 2px solid black; padding: 20px; margin: 20px; text-align: center;">
+        <h2 style="color: #333;">BRAIN TUMOR CLASSIFICATION & SEGMENTATION USING GRADCAM</h2>
+        <br>
+        <p style="color: #666; text-align: left;">Brain tumors encompass a diverse array of abnormal growths within the brain, which can arise from various cell types and locations. These tumors can be broadly categorized into primary and secondary tumors. Primary brain tumors originate within the brain itself, while secondary tumors, also known as metastatic brain tumors, originate elsewhere in the body and spread to the brain.</p>
+        <br>
+        <p style="color: #666; text-align: left;">The main types of primary brain tumors include:</p>
+        <ul style="text-align: left; margin-top: 10px;">
+            <li style="color: #666;"><strong style="color: black;">Gliomas:</strong> Arising from glial cells, which provide support and insulation to neurons, gliomas are the most common type of primary brain tumor. They can be further classified into subtypes such as astrocytomas, oligodendrogliomas, and ependymomas.</li>
+            <li style="color: #666;"><strong style="color: black;">Meningiomas:</strong> Originating from the meninges, the protective membranes surrounding the brain and spinal cord, meningiomas are typically benign tumors but can cause significant symptoms depending on their location and size.</li>
+            <li style="color: #666;"><strong style="color: black;">Pituitary Tumors:</strong> Arising from the pituitary gland, located at the base of the brain, pituitary tumors can affect hormone production and regulation, leading to various endocrine disorders.</li>
+            <li style="color: #666;"><strong style="color: black;">Medulloblastomas:</strong> Primarily affecting children and originating in the cerebellum, medulloblastomas are fast-growing tumors that can spread to other parts of the brain and spinal cord.</li>
+        </ul>
+        <br>
+        <p style="color: #666; text-align: left;">The significance of this project lies in addressing the challenges associated with accurate diagnosis and treatment planning for brain tumors. Traditional methods for brain tumor analysis, such as manual interpretation by radiologists, are time-consuming, subjective, and prone to errors. By leveraging deep learning techniques applied to MRI imaging data, our project aims to provide a more efficient and reliable solution for brain tumor classification and segmentation.</p>
+        
+        <p style="color: #666; text-align: left;">This project has the potential to significantly impact patient care and outcomes by facilitating early detection, accurate diagnosis, and personalized treatment strategies for individuals affected by brain tumors. By automating and enhancing the analysis of MRI images, healthcare professionals can make more informed decisions and provide better-tailored interventions, ultimately improving the quality of life for patients and their families.</p>
+    </div>
+
+    <script>
+        function showDropdown() {
+            document.getElementById("dropdownContent").style.display = "block";
+        }
+
+        function hideDropdown() {
+            document.getElementById("dropdownContent").style.display = "none";
+        }
+    </script>
+</body>
+</html>
